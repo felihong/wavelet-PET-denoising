@@ -3,9 +3,10 @@ import pywt
 import h5py
 import random 
 import tables
-import numpy as np
 import nibabel as nib
 import matplotlib.pylab as plt
+import numpy as np
+np.seterr(divide='ignore', invalid='ignore')
 
 
 class WaveletDataLoader:
@@ -223,10 +224,11 @@ class WaveletDataLoader:
         # Return preview dataset for testing
         return ds_preview
 
-    def shuffle_train_dataset(self, name='train'):
+    def shuffle(self, name='train'):
         """
         Shuffle training dataset stored in H5 file.
-        :param name: Shuffling target, by default set only to training data.
+        :param name: Shuffling target, either train or validation. 
+        no index shuffling applied if validation, by default set to train.
         """
         source_file = h5py.File(self.h5_file, mode='r')
         target_file = tables.open_file(self.h5_file_shuffled, mode='w', filters=self.h5_filters)
