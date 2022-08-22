@@ -6,6 +6,9 @@ __pycache__/
 # MacOS attribute file
 .DS_Store
 
+# PyCharm seetings
+.idea
+
 # C extensions
 *.so
 
