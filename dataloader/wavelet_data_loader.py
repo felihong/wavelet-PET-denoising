@@ -224,28 +224,37 @@ class WaveletDataLoader:
         # Return preview dataset for testing
         return ds_preview
 
-    def shuffle(self, name='train'):
+    def _shuffle(self, data, h5_file, name='train'):
         """
         Shuffle training dataset stored in H5 file.
+        :param data: Data reading from non-shuffled H5 file.
+        :param h5_file: H5 file name for shuffled data.
         :param name: Shuffling target, either train or validation. 
         no index shuffling applied if validation, by default set to train.
         """
-        source_file = h5py.File(self.h5_file, mode='r')
-        target_file = tables.open_file(self.h5_file_shuffled, mode='w', filters=self.h5_filters)
-
-        N, x, y, z  = source_file.get(name + '_original').shape
-        fulldose_pool = target_file.create_earray(target_file.root, name + '_original', tables.Float32Atom(), expectedrows=1000000, shape=(0, x, y, z))
-        lowdose_pool = target_file.create_earray(target_file.root, name + '_noisy', tables.Float32Atom(), expectedrows=1000000, shape=(0, x, y, z))
-        # Shuffle the index of training data
+        N, x, y, z  = data.get(name + '_original').shape
+        fulldose_pool = h5_file.create_earray(h5_file.root, name + '_original', tables.Float32Atom(), expectedrows=1000000, shape=(0, x, y, z))
+        lowdose_pool = h5_file.create_earray(h5_file.root, name + '_noisy', tables.Float32Atom(), expectedrows=1000000, shape=(0, x, y, z))
         index = np.arange(0, N)
+        # Shuffle the index of training data
         if name == 'train':
             np.random.seed(1314)
             np.random.shuffle(index)
         for count, idx, in enumerate(index):
             if count % 2000 == 0:
                 print('Finished --- ' + str('{:.0%}'.format(count / N)))
-            fulldose_pool.append(np.expand_dims(source_file.get(name + '_original')[idx,:,:], axis=0))
-            lowdose_pool.append(np.expand_dims(source_file.get(name + '_noisy')[idx,:,:], axis=0))
+            fulldose_pool.append(np.expand_dims(data.get(name+'_original')[idx,:,:], axis=0))
+            lowdose_pool.append(np.expand_dims(data.get(name+'_noisy')[idx,:,:], axis=0))
+
+    def shuffle_train_dataset(self):
+        """
+        Shuffle train and validation dataset stored in H5 file.
+        """
+        source_file = h5py.File(self.h5_file, mode='r')
+        target_file = tables.open_file(self.h5_file_shuffled, mode='w', filters=self.h5_filters)
+
+        self._shuffle(data=source_file, h5_file=target_file, name='train')
+        self._shuffle(data=source_file, h5_file=target_file, name='validation')
 
         target_file.close()
         source_file.close()
