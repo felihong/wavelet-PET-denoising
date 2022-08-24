@@ -41,18 +41,18 @@ class Predictor:
         :param data: Numpy array consisting of a PET image.
         :return: Normalized data, and tuple of (minimum, range) used for denormalization.
         """
-        range = np.max(data) - np.min(data)
-        return (data - np.min(data)) / range, (np.min(data), range)
+        d_range = np.max(data) - np.min(data)
+        return (data - np.min(data)) / d_range, (np.min(data), d_range)
 
-    def _denormalize(self, data, min, range):
+    def _denormalize(self, data, d_min, d_range):
         """
         Denormalize input array from (0, 1) back to original spacing.
         :param data: Normalized numpy array a PET image.
-        :param min: Minimum value used while normalization.
-        :param range: Range value used while normalization.
+        :param d_min: Minimum value used while normalization.
+        :param d_range: Range value used while normalization.
         :return: Denormalized PET image array.
         """
-        return data * range + min
+        return data * d_range + d_min
 
     def _from_small_path(self, PET, generator, patch_size=64):
         """
@@ -113,16 +113,16 @@ class Predictor:
         print(PET_restored.shape)
         return np.squeeze(PET_restored)
 
-    def post_processing(self, model_output, min, range):
+    def post_processing(self, model_output, d_min, d_range):
         """
         Post-processing applied to generator model output.
         :param model_output: PET image enhanced by generator model.
-        :param min: Minimum value used while normalization.
-        :param range: Range value used while normalization.
+        :param d_min: Minimum value used while normalization.
+        :param d_range: Range value used while normalization.
         :return: Processed PET image.
         """
         # De-normalization
-        noisy_recn = self._denormalize(data=model_output, min=min, range=range)
+        noisy_recn = self._denormalize(data=model_output, d_min=d_min, d_range=d_range)
         # Remove negative values
         noisy_recn = np.clip(noisy_recn, 0.0, np.max(noisy_recn))
         return noisy_recn
@@ -147,7 +147,7 @@ class Predictor:
             if not os.path.exists(save_dir):
                 os.makedirs(save_dir)
             for subject in os.listdir(lowdose_dir):
-                ds_test, (min, range), affine = self.load_test_dataset(lowdose_dir, subject)
+                ds_test, (d_min, d_range), affine = self.load_test_dataset(lowdose_dir, subject)
                 ds_test = self.apply_generator(ds_test)
-                ds_test = self.post_processing(model_output=ds_test, min=min, range=range)
+                ds_test = self.post_processing(model_output=ds_test, d_min=d_min, d_range=d_range)
                 self.save_subject_recn(ds_test, subject, affine, save_dir=save_dir)
