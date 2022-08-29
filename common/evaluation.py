@@ -259,8 +259,8 @@ class Evaluator():
             local_df = local_df.groupby('PID').agg('mean')[['MAPE']]
 
             eval_df = pd.merge(global_df, local_df, on=['PID'], how='inner')
+            eval_df['SCORE'] = eval_df.apply(lambda row: self._get_subject_SCORE(row), axis=1)
             all_df = all_df.append(eval_df)
 
-            all_df['SCORE'] = all_df.apply(lambda row: self._get_subject_SCORE(row), axis=1)
             all_df = all_df[['PID', 'NRMSE', 'PSNR', 'SSIM', 'MAPE', 'SCORE']]
             all_df.to_csv(self.report_csv, index=False)
