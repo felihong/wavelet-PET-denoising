@@ -73,10 +73,12 @@ data_loader = DataLoader(
     compress_level=3,
     random_factor=0.5
 )
+
 # Start training dataset creation
 data_loader.create_train_dataset(
     num_subject
 )
+
 # Index shuffling
 data_loader.shuffle_train_dataset()
 ```
@@ -94,11 +96,13 @@ data_loader = WaveletDataLoader(
     compress_level=3,
     random_factor=0.5
 )
+
 # Start training dataset creation
 data_loader.create_train_dataset(
     coeff_type='detail',  # Or 'approx' for approximation dataset
     num_subject
 )
+
 # Index shuffling
 data_loader.shuffle_train_dataset()
 ```
@@ -143,7 +147,45 @@ And below explains each of the key parameters in detail:
 use `PReLu` instead, as negative values are presented.
 
 ### Model prediction <a name="prediction"></a>
+Once the baseline model is finished training, one can enhance the low-dose, noisy inputs by leveraging the predictor module:
+```
+from prediction.baseline_inference import Predictor
 
+# Init baseline model predictor instance
+base_predictor = Predictor(
+   lowdose_dirs,
+   recn_path,
+   model_path,
+   epoch
+)
+
+# Start model prediction
+base_predictor.predict_all()
+```
+For wavelet models there are two models approximation and details involved, representing the wavelet approximation and 
+detail coefficients. One should provide both models' saving paths and epoch numbers to be used:
+```
+from prediction.wavelet_inference import WaveletPredictor
+
+# Init wavelet model approximation and detail prediction instances
+wt_predictor = WaveletPredictor(
+   lowdose_dirs,
+   recn_path,
+   model_path_approx,
+   model_path_detail,
+   epoch_approx,
+   epoch_detail
+)
+
+# Start model prediction
+wt_predictor.predict_all()
+```
+
+Below explains each of the parameters in detail:
+* `lowdose_dirs`: List of directory paths containing noisy, low-dose test subjects, in form of Nifti images
+* `recn_path`: Path specified to store model reconstructions
+* `model_path`: Path of trained model, for wavelet models both approximation-/detail model paths are required
+* `epoch`: Integer value indicating the epoch number, for wavelet models both approximation-/detail epochs are required
 
 ### Evaluation <a name="evaluation"></a>
 The evaluation is performed according to both global (physical) and local (clinical) metrics, all metrics are measured 
