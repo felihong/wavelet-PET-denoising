@@ -9,11 +9,13 @@ grand-challenge platform.
 2. [Installation](#installation)
 3. [Dataset creation](#dataset-creation)
 4. [Submit training](#submit-training)
-5. [Evaluation](#evaluation)
+5. [Model prediction](#prediction)
+6. [Evaluation](#evaluation)
 
 ## Project introduction <a name="introduction"></a>
 This project handles data & model workflow from training dataset preparation to model training, prediction and final
 evaluation. All main components are implemented as Python classes, including:
+
 * `DataLoader`: Handles functions and logic of creating training datasets from raw input PET images for baseline
 model, `dataloader/baseline_data_loader.py`.
 * Wavelet DataLoader: Handles functions and logic of creating training datasets from raw input PET images for wavelet 
@@ -27,8 +29,8 @@ and processing transformations to acquire enhanced PET output,`prediction/wavele
 * Evaluator: Measures quality enhancement with respect to global and local metrics, `common/evaluation.py`.
 
 A high-level architecture design is shown as follows:
-![architecture](docs/architecture.jpg)
 
+<img src="docs/architecture.jpg" width="500"/>
 
 ## Installation <a name="installation"></a>
 We use `Python=3.5.2` as main interpreter, based on which multiple deep-learning and data science packages are installed. 
@@ -132,27 +134,66 @@ And below explains each of the key parameters in detail:
 * `activation`: Activation function, use `ReLu` if set to None. In case of wavelet detail model, it is recommended to 
 use `PReLu` instead, as negative values are presented.
 
+## Model prediction <a name="prediction"></a>
+
+
 ## Evaluation <a name="evaluation"></a>
+The evaluation is performed according to both global (physical) and local (clinical) metrics, all metrics are measured 
+based on which a final weighted score value is computed. Below table represents the evaluation metrics together with
+intra-/inter group weights:
+
+|                      | Metrics                             | Intra-group weights |
+|----------------------|-------------------------------------|---------------------|
+| Global metrics (50%) | NRMSE                               | 40%                 |
+|                      | PSNR                                | 40%                 |
+|                      | SSIM                                | 20%                 |
+| Local metrics (50%)  | SUV_max                             | 20%                 |
+|                      | SUV_mean                            | 20%                 |
+|                      | PSNR                                | 15%                 |
+|                      | Total Lesion Glycolysis             | 15%                 |
+|                      | First order: RootMeanSquared        | 5%                  |
+|                      | First order: 90Percentile           | 5%                  |
+|                      | First order: Median                 | 5%                  |
+|                      | GLRLM: High Gray Level Run Emphasis | 5%                  |
+|                      | GLSZM: Zone Percentage              | 5%                  |
+|                      | GLCM: Joint Average                 | 5%                  |
 
 
+Having test dataset predicted, and the original full-dose images prepared, one needs to prepare mask images to leverage
+local metrics. All tests should be labelled with ROI organs e.g. liver, heart, left kidney and right kidney.
+A prepared test group should have the following structure:
+```
+|-- Test
+|   |-- original
+|   |   |-- PID_01.nii.gz
+|   |   `-- PID_02.nii.gz
+|   |-- prediction
+|   |   |-- PID_01.nii.gz
+|   |   `-- PID_02.nii.gz
+|   |-- mask
+|   |   |-- PID_01.nii.gz
+|   |   `-- PID_02.nii.gz
+|   `-- meta_info.csv
+```
 
+Having all required dataset prepared, one can start with the evaluation job as follows:
+```
+from common.evaluation import Evaluator
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Init evaluator instance
+evaluator = Evaluator(
+    real_dir,
+    pred_dir,
+    mask_dir,
+    meta_info,
+    output_path
+)
+# Evaluate all features
+evaluator.evaluate_all()
+```
+where each of the parameters can be referenced as follows:
+* `real_dir`: Path of directory containing original, full-dose test Nifti images
+* `pred_dir`: Path of directory containing model predictions, in form of reconstructed Nifti images
+* `mask_dir`: Path of directory containing organ RoI masks, in form of Nifti files
+* `meta_info`: A csv file containing test subjects' metadata, including e.g. `scanner, PID, DRF, weight, dose`
+* `output_path`: Optional, directory to save the csv evaluation report 
