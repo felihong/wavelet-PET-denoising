@@ -44,6 +44,57 @@ pip install -r requirements.txt
 ```
 
 ## Dataset creation
+Both data loaders of baseline and wavelet models are wrapped into Python classes. One can use the following snippet to
+create training dataset for `baseline` model, which is implemented in `DataLoader` class:
+```
+from dataloader.baseline_data_loader import DataLoader
+
+# Init dataloader instance
+data_loader = DataLoader(
+    fulldose_dir, 
+    lowdose_dirs,
+    h5_file,
+    h5_file_shuffled,
+    compress_level=3,
+    random_factor=0.5
+)
+# Start training dataset creation
+data_loader.create_train_dataset(
+    num_subject
+)
+# Index shuffling
+data_loader.shuffle_train_dataset()
+```
+
+Similarly, the following signatures can be used to create dataset for `wavelet` model, using `WaveletDataLoader` class:
+```
+from dataloader.wavelet_data_loader import WaveletDataLoader
+
+# Init wavelet dataloader instance
+data_loader = WaveletDataLoader(
+    fulldose_dir, 
+    lowdose_dirs,
+    h5_file,
+    h5_file_shuffled,
+    compress_level=3,
+    random_factor=0.5
+)
+# Start training dataset creation
+data_loader.create_train_dataset(
+    coeff_type='detail',  # Or 'approx' for approximation dataset
+    num_subject
+)
+# Index shuffling
+data_loader.shuffle_train_dataset()
+```
+Below explains each of the key parameters in detail:
+* `fulldose_dir`: Directory path containing original, full-dose PET nifti files in forms of PID.nii.gz
+* `lowdose_dirs`: List of directories containing the respective noisy, low-dose PET nifti files, also in forms of PID.nii.gz
+* `h5_file`: Path of HDF5 file to store intermediate non-shuffled array dataset
+* `h5_file_shuffled`: Path pf HDF5 file for storing final, shuffled array dataset
+* `compress_level`: Integer value ranging from 0 to 9, indicating the compression level of the H5 files
+* `random_factor`: Float value ranging from 0.0 to 1.0, indicating the percentage of random values to be included in each of the axes.
+
 
 ## Submit training
 
