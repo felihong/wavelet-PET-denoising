@@ -1,12 +1,14 @@
 # wavelet-PET-denoising
-
 This repository contains source code for enhancing `low-dose PET` (positron-emission-tomography) images 
 using `3D-UNet` model on `wavelet` domain. Project initialized by ultra-low-dose PET
 [Grand Challenge](https://ultra-low-dose-pet.grand-challenge.org/), and all clinical PET data are collected from the 
 grand-challenge platform.
 
-## Project introduction
+# Table of contents
+1. [Introduction](#introduction)
+2. [Installation](#installation)
 
+## Project introduction <a name="introduction"></a>
 This project handles data & model workflow from training dataset preparation to model training, prediction and final
 evaluation. All main components are implemented as Python classes, including:
 * `DataLoader`: Handles functions and logic of creating training datasets from raw input PET images for baseline
@@ -25,7 +27,7 @@ A high-level architecture design is shown as follows:
 ![architecture](docs/architecture.jpg)
 
 
-## Get started
+## Installation <a name="installation"></a>
 We use `Python=3.5.2` as main interpreter, based on which multiple deep-learning and data science packages are installed. 
 Use the following commands to clone the project:
 ```
