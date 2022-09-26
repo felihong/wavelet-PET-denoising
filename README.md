@@ -95,7 +95,59 @@ Below explains each of the key parameters in detail:
 * `compress_level`: Integer value ranging from 0 to 9, indicating the compression level of the H5 files
 * `random_factor`: Float value ranging from 0.0 to 1.0, indicating the percentage of random values to be included in each of the axes.
 
-
 ## Submit training
+Once the training dataset is prepared, one can submit the training jobs using the designed `3D-UNet` network:
+```
+from networks.FCN_3D import SR_UnetGAN_3D
+
+unet = SR_UnetGAN_3D(
+    data_path,
+    save_dir,
+    train_data_len,  
+    val_data_len,    
+    img_shape=(1, 64, 64, 64),
+    epochs=100,
+    batch_size=8,
+    loss='mse',
+    max_pooling=False,
+    activation=None
+)
+unet.train()
+```
+And below explains each of the key parameters in detail:
+* `data_path`: Path of HDF5 file containing training and validation dataset
+* `save_dir`: Path to save model output
+* `train_data_len`: Length of training dataset, can be checked using `check_size()` method of the data loader classes.
+* `val_data_len`: Length of validation dataset. 
+* `img_shape`: Shape of each of the 3D patch volume, by default (1, 64, 64, 64)
+* `epochs`: Number of target epochs, by default 10
+* `batch_size`: Size of each batch, by default 4
+* `loss`: Loss function, by default MSE (L1)
+* `max_pooling`: Boolean value indicating whether to use max pooling, by default False
+* `activation`: Activation function, use `ReLu` if set to None. In case of wavelet detail model, it is recommended to 
+use `PReLu` instead, as negative values are presented.
 
 ## Evaluation
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
