@@ -26,6 +26,22 @@ A high-level architecture design is shown as follows:
 
 
 ## Get started
+We use `Python=3.5.2` as main interpreter, based on which multiple deep-learning and data science packages are installed. 
+Use the following commands to clone the project:
+```
+git clone https://github.com/felihong/wavelet-PET-denoising.git
+cd wavelet-PET-denoising
+```
+Afterwards, install `virtualenv` to create a new virtual environment:
+```
+pip install virtualenv
+virtualenv --python python3.5.2 venv
+```
+Activate the created environment and install all required packages:
+```
+source ~/virtualenv/venv/bin/activate
+pip install -r requirements.txt
+```
 
 ## Dataset creation
 
