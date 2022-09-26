@@ -7,10 +7,11 @@ grand-challenge platform.
 # Table of contents
 1. [Introduction](#introduction)
 2. [Installation](#installation)
-3. [Dataset creation](#dataset-creation)
-4. [Submit training](#submit-training)
-5. [Model prediction](#prediction)
-6. [Evaluation](#evaluation)
+3. [Data/Model pipeline](#pipeline)
+   1. [Dataset creation](#dataset-creation)
+   2. [Submit training](#submit-training)
+   3. [Model prediction](#prediction)
+   4. [Evaluation](#evaluation)
 
 ## Project introduction <a name="introduction"></a>
 This project handles data & model workflow from training dataset preparation to model training, prediction and final
@@ -50,7 +51,14 @@ source ~/virtualenv/venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Dataset creation <a name="dataset-creation"></a>
+## Data/Model pipeline <a name="pipeline"></a>
+Both baseline and wavelet models are constructed in a pipeline style, which consisting the main components 
+e.g. dataset creation, model training, model prediction, and finally PET image quality evaluation. 
+Below figure illustrates the high-level pipeline structure as well as component relationships:
+
+<img src="docs/pipeline_structure.png" width="500"/>
+
+### Dataset creation <a name="dataset-creation"></a>
 Both data loaders of baseline and wavelet models are wrapped into Python classes. One can use the following snippet to
 create training dataset for `baseline` model, which is implemented in `DataLoader` class:
 ```
@@ -102,7 +110,7 @@ Below explains each of the key parameters in detail:
 * `compress_level`: Integer value ranging from 0 to 9, indicating the compression level of the H5 files
 * `random_factor`: Float value ranging from 0.0 to 1.0, indicating the percentage of random values to be included in each of the axes.
 
-## Submit training <a name="submit-training"></a>
+### Submit training <a name="submit-training"></a>
 Once the training dataset is prepared, one can submit the training jobs using the designed `3D-UNet` network:
 ```
 from networks.FCN_3D import SR_UnetGAN_3D
@@ -134,10 +142,10 @@ And below explains each of the key parameters in detail:
 * `activation`: Activation function, use `ReLu` if set to None. In case of wavelet detail model, it is recommended to 
 use `PReLu` instead, as negative values are presented.
 
-## Model prediction <a name="prediction"></a>
+### Model prediction <a name="prediction"></a>
 
 
-## Evaluation <a name="evaluation"></a>
+### Evaluation <a name="evaluation"></a>
 The evaluation is performed according to both global (physical) and local (clinical) metrics, all metrics are measured 
 based on which a final weighted score value is computed. Below table represents the evaluation metrics together with
 intra-/inter group weights:
@@ -197,3 +205,5 @@ where each of the parameters can be referenced as follows:
 * `mask_dir`: Path of directory containing organ RoI masks, in form of Nifti files
 * `meta_info`: A csv file containing test subjects' metadata, including e.g. `scanner, PID, DRF, weight, dose`
 * `output_path`: Optional, directory to save the csv evaluation report 
+
+
