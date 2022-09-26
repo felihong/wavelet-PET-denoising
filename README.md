@@ -7,6 +7,9 @@ grand-challenge platform.
 # Table of contents
 1. [Introduction](#introduction)
 2. [Installation](#installation)
+3. [Dataset creation](#dataset-creation)
+4. [Submit training](#submit-training)
+5. [Evaluation](#evaluation)
 
 ## Project introduction <a name="introduction"></a>
 This project handles data & model workflow from training dataset preparation to model training, prediction and final
@@ -45,7 +48,7 @@ source ~/virtualenv/venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Dataset creation
+## Dataset creation <a name="dataset-creation"></a>
 Both data loaders of baseline and wavelet models are wrapped into Python classes. One can use the following snippet to
 create training dataset for `baseline` model, which is implemented in `DataLoader` class:
 ```
@@ -97,7 +100,7 @@ Below explains each of the key parameters in detail:
 * `compress_level`: Integer value ranging from 0 to 9, indicating the compression level of the H5 files
 * `random_factor`: Float value ranging from 0.0 to 1.0, indicating the percentage of random values to be included in each of the axes.
 
-## Submit training
+## Submit training <a name="submit-training"></a>
 Once the training dataset is prepared, one can submit the training jobs using the designed `3D-UNet` network:
 ```
 from networks.FCN_3D import SR_UnetGAN_3D
@@ -129,7 +132,7 @@ And below explains each of the key parameters in detail:
 * `activation`: Activation function, use `ReLu` if set to None. In case of wavelet detail model, it is recommended to 
 use `PReLu` instead, as negative values are presented.
 
-## Evaluation
+## Evaluation <a name="evaluation"></a>
 
 
 
